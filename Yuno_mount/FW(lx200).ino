@@ -14,7 +14,7 @@ void setup(){
 }
 
 void loop(){ 
-	while(!(str.startsWith("#:") && str.endsWith("#"))){
+    while(!(str.startsWith("#:") && str.endsWith("#"))){
         if(Serial.available()){
             str.concat((char)Serial.read());
         }
@@ -35,9 +35,9 @@ void loop(){
         Serial.write(LX); 
     }
 	
-	else{
+    else{
 		
-	}
+    }
 	
     str = "";
 }
