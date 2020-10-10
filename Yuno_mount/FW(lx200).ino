@@ -9,16 +9,17 @@ char dec_sign = 0;
     Author:     Kimtaeyoon
 */
 void setup(){
-	Serial.begin(9600);
-	
+    pinMode(13, OUTPUT);
+    digitalWrite(13, LOW);
+    Serial.begin(9600);
 }
 
 void loop(){ 
-    while(!(str.startsWith("#:") && str.endsWith("#"))){
+    while( !(str.length()>1 && str.endsWith("#")) ){
         if(Serial.available()){
             str.concat((char)Serial.read());
         }
-    }	
+    }
 		
 	
     if ( str=="#:GR#") {
@@ -36,7 +37,9 @@ void loop(){
     }
 	
     else{
-		
+        digitalWrite(13, HIGH);
+	delay(100);
+	digitalWrite(13, LOW);
     }
 	
     str = "";
