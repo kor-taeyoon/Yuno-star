@@ -1,8 +1,8 @@
-###### Yuno-star
+## Yuno-star
 
 
 
-# GOAL
+#### GOAL
 
 - strain wave geared, Equatorial Mount.
 
