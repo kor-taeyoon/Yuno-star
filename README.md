@@ -20,7 +20,7 @@
 
 - stm32f103c8t6 blue pill
 
-- HM-10 (module)
+- HC-06
 
 - LV8729 * 2
 
