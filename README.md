@@ -12,7 +12,7 @@
 
 - Compatible with Kstars (Raspberry pi)
 
-- Work with Wireless Controller (BT 4.2)
+- Work with Wireless Controller
 
 
 
