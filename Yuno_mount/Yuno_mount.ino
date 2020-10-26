@@ -1,22 +1,29 @@
-
 /*
-    Name:       test_yuno_lx200.ino
-    Created:	2020-09-23 오후 12:06:44
-    Author:     Kimtaeyoon
+    Name:       Yuno_mount.ino
+    Created:	2020-10-26-월 오후 6:50:50
+    Author:     DESKTOP-QCUIDBD\Kimtaeyoon
 */
 #include <Arduino.h>
 #include <AccelStepper.h>
 
 /* constant */
+// 24 * 60 * 60 = 86400 ~= 86164
+// 
 const unsigned period = 0;  //86164 sec per day
+
 
 /* global variable */
 String command = "";
-String temp = "";
+String temp_string = "";
+long temp_long = 0;
 long ra_pos = 0;
 long dec_pos = 0;
 char dec_sign = '+';
-
+long ra_pos_target = 0;
+long dec_pos_target = 0;
+char dec_sign_target = '+';
+AccelStepper RA_stepper(AccelStepper::DRIVER, PA12, PA11);
+AccelStepper DEC_stepper(AccelStepper::DRIVER, PB13, PB12);
 
 
 /* setup */
@@ -44,20 +51,31 @@ void setup(){
     /* tracking */
     Timer1.setChannel1Mode(TIMER_OUTPUT_COMPARE);
     Timer1.setPeriod(1000000);    //us
-    Timer1.attachCompare1Interrupt(track);
+    Timer1.attachCompare1Interrupt(TrackingPulse);
     
     /* serial comm */
     Serial.begin(9600);     //for develop
     Serial3.begin(38400);   //bluetooth
+    
+    /* stepper initialize */
+    RA_stepper.setMaxSpeed(2000);
+    RA_stepper.setAcceleration(1000);
+    RA_stepper.setCurrentPosition(0);
+    DEC_stepper.setMaxSpeed(20000);
+    DEC_stepper.setAcceleration(10000);
+    DEC_stepper.setCurrentPosition(0);
+    
+    
 }
 
 /* loop */
-void loop(){ 
-	if(Serial3.available()){
+void loop(){
+    if(Serial3.available()){
         command = Serial3.readStringUntil('#');
-        bt_handler();
+        BlueHandler();
         Serial.println(command);    //for develop
         command = "";
     }
-    
+    RA_stepper.run();
+    DEC_stepper.run();
 }
