@@ -4,81 +4,60 @@
     Created:	2020-09-23 오후 12:06:44
     Author:     Kimtaeyoon
 */
+#include <Arduino.h>
+#include <AccelStepper.h>
 
-unsigned long period; 
-String str = "";
-long ra_pos = 3600;
-long dec_pos = 36000;
-char dec_sign = 0;
+/* constant */
+const unsigned period = 0;  //86164 sec per day
 
+/* global variable */
+String command = "";
+String temp = "";
+long ra_pos = 0;
+long dec_pos = 0;
+char dec_sign = '+';
+
+
+
+/* setup */
 void setup(){
-	pinMode(PC13, OUTPUT);
-	digitalWrite(PC13, LOW);
-	
     
+    /* pin out setup */
+    pinMode(PB4, OUTPUT);   //ra m0
+    pinMode(PB3, OUTPUT);   //ra m1
+    pinMode(PA15, OUTPUT);  //ra m2
+    pinMode(PA12, OUTPUT);  //ra step
+    pinMode(PA11, OUTPUT);  //ra dir
+    pinMode(PA8, OUTPUT);   //dec m0
+    pinMode(PB15, OUTPUT);  //dec m1
+    pinMode(PB14, OUTPUT);  //dec m2
+    pinMode(PB13, OUTPUT);  //dec step
+    pinMode(PB12, OUTPUT);  //dec dir
+    pinMode(LED_BUILTIN, OUTPUT);
     
-    Serial.begin(9600);
-    Serial3.begin(38400);
+    /* guide port */
+    pinMode(PB6, INPUT);    //+RA (Left)
+    pinMode(PB7, INPUT);    //+DEC(Up)
+    pinMode(PB8, INPUT);    //-DEC(Down)
+    pinMode(PB9, INPUT);    //-RA (Right)
+    
+    /* tracking */
+    Timer1.setChannel1Mode(TIMER_OUTPUT_COMPARE);
+    Timer1.setPeriod(1000000);    //us
+    Timer1.attachCompare1Interrupt(track);
+    
+    /* serial comm */
+    Serial.begin(9600);     //for develop
+    Serial3.begin(38400);   //bluetooth
 }
 
+/* loop */
 void loop(){ 
 	if(Serial3.available()){
-        str = Serial3.readStringUntil('#');
-        //Serial.println(str);    for develop
+        command = Serial3.readStringUntil('#');
+        bt_handler();
+        Serial.println(command);    //for develop
+        command = "";
     }
     
-    
-    
-    /************************************************************************/
-    /*                              1st                                     */
-    /************************************************************************/
-    if ( str==":GR" ) {
-        char LX[10];
-        sprintf(LX, "%02d:%02d:%02d#", ++ra_pos/3600, (ra_pos%3600)/60, ra_pos%60);
-        Serial3.write(LX); 
-    }
-    else if ( str==":GD" ) {
-        char LX[11];
-        if(dec_pos>=0) dec_sign='+';
-        else dec_sign='-';
-        sprintf(LX, "%c%02d*%02d:%02d#", dec_sign, dec_pos/3600, (dec_pos%3600)/60, dec_pos%60);
-        Serial3.write(LX); 
-    }
-    
-    
-     
-    /************************************************************************/
-    /*                              2nd                                     */
-    /************************************************************************/
-    else if( str.indexOf("Sr")>0 ){
-        Serial3.write("1");
-    }
-    else if( str.indexOf("Sd")>0 ){
-        Serial3.write("1");
-    }
-    
-    
-
-    /************************************************************************/
-    /*                              last                                    */
-    /************************************************************************/
-    else if( (str==":CM") || (str==":CMR") ){
-        Serial3.write("Coordinates  matched #");
-        ra_pos+=10;
-        dec_pos+=50;
-        Serial.println("Master : Syncing");
-    }
-    else if( (str==":MS") ){
-        Serial3.write("0");
-        ra_pos+=10;
-        dec_pos+=50;
-        Serial.println("Master : slewing");
-    }
-    
-    
-    
-    else{
-        
-    }
-    str = "";
 }
