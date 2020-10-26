@@ -43,7 +43,7 @@ void bt_handler(){
     
     /* sync */
     else if( (command == ":CM") ){
-        Serial3.write("Coordinates matched #");
+        Serial3.write("Coordinates  matched #");
         
         Serial.println("Master : Syncing");
     }
