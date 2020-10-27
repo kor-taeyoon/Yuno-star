@@ -16,12 +16,10 @@ const unsigned period = 0;  //86164 sec per day
 String command = "";
 String temp_string = "";
 long temp_long = 0;
-long ra_pos = 0;
-long dec_pos = 0;
-char dec_sign = '+';
-long ra_pos_target = 0;
-long dec_pos_target = 0;
-char dec_sign_target = '+';
+long ra_pos = 0;            //looking coordinate
+long dec_pos = 0;           //looking coordinate
+long ra_pos_target = 0;     //target coordinate
+long dec_pos_target = 0;    //target coordinate
 AccelStepper RA_stepper(AccelStepper::DRIVER, PA12, PA11);
 AccelStepper DEC_stepper(AccelStepper::DRIVER, PB13, PB12);
 
@@ -59,10 +57,10 @@ void setup(){
     
     /* stepper initialize */
     RA_stepper.setMaxSpeed(2000);
-    RA_stepper.setAcceleration(1000);
+    RA_stepper.setAcceleration(3000);
     RA_stepper.setCurrentPosition(0);
     DEC_stepper.setMaxSpeed(20000);
-    DEC_stepper.setAcceleration(10000);
+    DEC_stepper.setAcceleration(30000);
     DEC_stepper.setCurrentPosition(0);
     
     
@@ -78,4 +76,11 @@ void loop(){
     }
     RA_stepper.run();
     DEC_stepper.run();
+    if( RA_stepper.currentPosition() >= 0 ){
+        ra_pos = RA_stepper.currentPosition() % 86400;
+    }
+    else{
+        ra_pos = RA_stepper.currentPosition() + 86400;
+    }        
+    dec_pos = DEC_stepper.currentPosition();
 }
