@@ -4,20 +4,20 @@ void BlueHandler(){
     /* coordinate update */
     if ( command == ":GR" ) {
         char LX[10];
-        sprintf(LX, "%02d:%02d:%02d#", (int)(abs(RA_stepper.currentPosition())/3600), (int)((abs(RA_stepper.currentPosition())%3600)/60), (int)(abs(RA_stepper.currentPosition())%60));
+        sprintf(LX, "%02d:%02d:%02d#", (int)(ra_pos/3600), (int)((ra_pos%3600)/60), (int)(ra_pos%60));
         Serial3.write(LX);
-        Serial.println(RA_stepper.currentPosition());
+        Serial.println(ra_pos);
     }
     else if ( command == ":GD" ) {
         char LX[11];
-        if( DEC_stepper.currentPosition()>=0 ){
-            sprintf(LX, "+%02d*%02d:%02d#", (int)(abs(DEC_stepper.currentPosition())/3600), (int)((abs(DEC_stepper.currentPosition())%3600)/60), (int)(abs(DEC_stepper.currentPosition())%60));
+        if( dec_pos >=0 ){
+            sprintf(LX, "+%02d*%02d:%02d#", (int)(abs(dec_pos)/3600), (int)((abs(dec_pos)%3600)/60), (int)(abs(dec_pos)%60));
         }
         else{
-            sprintf(LX, "-%02d*%02d:%02d#", (int)(abs(DEC_stepper.currentPosition())/3600), (int)((abs(DEC_stepper.currentPosition())%3600)/60), (int)(abs(DEC_stepper.currentPosition())%60));
+            sprintf(LX, "-%02d*%02d:%02d#", (int)(abs(dec_pos)/3600), (int)((abs(dec_pos)%3600)/60), (int)(abs(dec_pos)%60));
         }
         Serial3.write(LX);
-        Serial.println(DEC_stepper.currentPosition());
+        Serial.println(dec_pos);
     }
 
 
@@ -61,8 +61,7 @@ void BlueHandler(){
         DEC_stepper.setCurrentPosition(dec_pos_target);
         
         Serial3.write("Coordinates  matched #");
-        
-        Serial.println("Master : Syncing");
+        Serial.println("Master : synced");
     }
     
     
@@ -71,17 +70,20 @@ void BlueHandler(){
         Serial3.write("0");//possible
         long RA_togo = 0, DEC_togo = 0;
         
+        /* calculate how far to go */
+        
+        
         /* RA */
-        RA_togo = ra_pos_target - RA_stepper.currentPosition();
+        RA_togo = ra_pos_target - ra_pos;
+        if( abs(RA_togo) >= 43200 ){
+            if( RA_togo >= 0 ) RA_togo -= 86400;
+            else RA_togo += 86400;
+        }
         RA_stepper.move(RA_togo);
         
         /* DEC */
-        DEC_togo = dec_pos_target - DEC_stepper.currentPosition();
+        DEC_togo = dec_pos_target - dec_pos;
         DEC_stepper.move(DEC_togo);
-        
-        //problem1. RA 24 to 0?
-        
-        
     }
 
 
