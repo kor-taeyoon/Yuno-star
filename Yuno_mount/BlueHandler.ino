@@ -19,8 +19,36 @@ void BlueHandler(){
         Serial3.write(LX);
         Serial.println(dec_pos);
     }
+    
+    
+    /* Manual Move */
+    else if( (command==":Me") ){
+        // Go East activate
+    }
+    else if( (command==":Mw") ){
+        // Go West activate
+    }
+    else if( (command==":Ms") ){
+        // Go South activate
+    }
+    else if( (command==":Mn") ) {
+        // Go North activate
+    }
+    
+    else if( (command==":Qe") ){
+        // Stop manual move
+    }
+    else if( (command==":Qw") ){
+        // Stop manual move
+    }
+    else if( (command==":Qs") ){
+        // Stop manual move
+    }
+    else if( (command==":Qn") ){
+        // Stop manual move
+    }
 
-
+    
     /* available test */
     else if( command.startsWith(":Sr") ){   //RA coordinate test
         
