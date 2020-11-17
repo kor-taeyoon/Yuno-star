@@ -1,6 +1,5 @@
 
-void BlueHandler(){
-    
+void BlueHandler(){    
     /* coordinate update */
     if ( command == ":GR" ) {
         char LX[10];
@@ -20,34 +19,48 @@ void BlueHandler(){
         Serial.println(dec_pos);
     }
     
-    
+
+
+
+
     /* Manual Move */
     else if( (command==":Me") ){
         // Go East activate
+        RA_stepper.moveTo(100000);
     }
     else if( (command==":Mw") ){
         // Go West activate
+        RA_stepper.moveTo(-100000);
     }
     else if( (command==":Ms") ){
         // Go South activate
+        DEC_stepper.moveTo(100000);
     }
     else if( (command==":Mn") ) {
         // Go North activate
+        DEC_stepper.moveTo(-100000);
     }
     
     else if( (command==":Qe") ){
         // Stop manual move
+        RA_stepper.stop();
     }
     else if( (command==":Qw") ){
         // Stop manual move
+        RA_stepper.stop();
     }
     else if( (command==":Qs") ){
         // Stop manual move
+        DEC_stepper.stop();
     }
     else if( (command==":Qn") ){
         // Stop manual move
+        DEC_stepper.stop();
     }
 
+
+
+    
     
     /* available test */
     else if( command.startsWith(":Sr") ){   //RA coordinate test
@@ -83,14 +96,20 @@ void BlueHandler(){
     }
     
     
+    
+    
+    
     /* sync */
     else if( (command == ":CM") ){
         RA_stepper.setCurrentPosition(ra_pos_target);
         DEC_stepper.setCurrentPosition(dec_pos_target);
         
-        Serial3.write("Coordinates  matched #");
+        Serial3.write("N/A#");
         Serial.println("Master : synced");
     }
+    
+    
+    
     
     
     /* slew to object */
