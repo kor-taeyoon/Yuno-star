@@ -5,7 +5,7 @@ void BlueHandler(){
         char LX[10];
         sprintf(LX, "%02d:%02d:%02d#", (int)(ra_pos/3600), (int)((ra_pos%3600)/60), (int)(ra_pos%60));
         Serial3.write(LX);
-        Serial.println(ra_pos);
+        //Serial.println(ra_pos);
     }
     else if ( command == ":GD" ) {
         char LX[11];
@@ -16,7 +16,7 @@ void BlueHandler(){
             sprintf(LX, "-%02d*%02d:%02d#", (int)(abs(dec_pos)/3600), (int)((abs(dec_pos)%3600)/60), (int)(abs(dec_pos)%60));
         }
         Serial3.write(LX);
-        Serial.println(dec_pos);
+        //Serial.println(dec_pos);
     }
     
 
@@ -26,19 +26,19 @@ void BlueHandler(){
     /* Manual Move */
     else if( (command==":Me") ){
         // Go East activate
-        RA_stepper.moveTo(100000);
+        RA_stepper.moveTo(1000000);
     }
     else if( (command==":Mw") ){
         // Go West activate
-        RA_stepper.moveTo(-100000);
+        RA_stepper.moveTo(-1000000);
     }
     else if( (command==":Ms") ){
         // Go South activate
-        DEC_stepper.moveTo(100000);
+        DEC_stepper.moveTo(-1000000);
     }
     else if( (command==":Mn") ) {
         // Go North activate
-        DEC_stepper.moveTo(-100000);
+        DEC_stepper.moveTo(1000000);
     }
     
     else if( (command==":Qe") ){
@@ -101,8 +101,8 @@ void BlueHandler(){
     
     /* sync */
     else if( (command == ":CM") ){
-        RA_stepper.setCurrentPosition(ra_pos_target);
-        DEC_stepper.setCurrentPosition(dec_pos_target);
+        RA_stepper.setCurrentPosition(ra_CorToPos(ra_pos_target));
+        DEC_stepper.setCurrentPosition(dec_CorToPos(dec_pos_target));
         
         Serial3.write("N/A#");
         Serial.println("Master : synced");
@@ -114,11 +114,8 @@ void BlueHandler(){
     
     /* slew to object */
     else if( (command==":MS") ){
-        Serial3.write("0");//possible
+        Serial3.write("0"); // reply that target is possible
         long RA_togo = 0, DEC_togo = 0;
-        
-        /* calculate how far to go */
-        
         
         /* RA */
         RA_togo = ra_pos_target - ra_pos;
@@ -126,11 +123,11 @@ void BlueHandler(){
             if( RA_togo >= 0 ) RA_togo -= 86400;
             else RA_togo += 86400;
         }
-        RA_stepper.move(RA_togo);
+        RA_stepper.move(ra_CorToPos(RA_togo));
         
         /* DEC */
         DEC_togo = dec_pos_target - dec_pos;
-        DEC_stepper.move(DEC_togo);
+        DEC_stepper.move(dec_CorToPos(DEC_togo));
     }
 
 
