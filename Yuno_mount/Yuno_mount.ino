@@ -8,21 +8,19 @@
 
 /* constant */
 // 24 * 60 * 60 = 86400 ~= 86164
-// 
 const unsigned period = 0;  //86164 sec per day
-
 
 /* global variable */
 String command = "";
 String temp_string = "";
 long temp_long = 0;
+
 long ra_pos = 0;            //looking coordinate
 long dec_pos = 0;           //looking coordinate
 long ra_pos_target = 0;     //target coordinate
 long dec_pos_target = 0;    //target coordinate
 AccelStepper RA_stepper(AccelStepper::DRIVER, PA12, PA11);
 AccelStepper DEC_stepper(AccelStepper::DRIVER, PB13, PB12);
-
 
 /* setup */
 void setup(){
@@ -40,6 +38,11 @@ void setup(){
     pinMode(PB12, OUTPUT);  //dec dir
     pinMode(LED_BUILTIN, OUTPUT);
     
+    ra_MicroStepChanger(7);
+    delay(1);
+    dec_MicroStepChanger(5);
+    delay(1);
+    
     /* guide port */
     pinMode(PB6, INPUT);    //+RA (Left)
     pinMode(PB7, INPUT);    //+DEC(Up)
@@ -56,14 +59,16 @@ void setup(){
     Serial3.begin(38400);   //bluetooth
     
     /* stepper initialize */
-    RA_stepper.setMaxSpeed(2000);
-    RA_stepper.setAcceleration(3000);
+    RA_stepper.setMaxSpeed(4000);
+    RA_stepper.setAcceleration(2000);
     RA_stepper.setCurrentPosition(0);
-    DEC_stepper.setMaxSpeed(20000);
-    DEC_stepper.setAcceleration(30000);
+    
+    DEC_stepper.setMaxSpeed(4000);
+    DEC_stepper.setAcceleration(2000);
     DEC_stepper.setCurrentPosition(0);
     
-    
+    //RA_stepper.setPinsInverted(true, false, false);    
+    //DEC_stepper.setPinsInverted(true, false, false);
 }
 
 /* loop */
@@ -71,16 +76,16 @@ void loop(){
     if(Serial3.available()){
         command = Serial3.readStringUntil('#');
         BlueHandler();
-        Serial.println(command);    //for develop
+        //Serial.println(command);    //for develop
         command = "";
     }
     RA_stepper.run();
     DEC_stepper.run();
     if( RA_stepper.currentPosition() >= 0 ){
-        ra_pos = RA_stepper.currentPosition() % 86400;
+        ra_pos = ra_PosToCor(RA_stepper.currentPosition()) % 86400;
     }
     else{
-        ra_pos = RA_stepper.currentPosition() + 86400;
-    }        
-    dec_pos = DEC_stepper.currentPosition();
+        ra_pos = ra_PosToCor(RA_stepper.currentPosition()) + 86400;
+    }
+    dec_pos = dec_PosToCor(DEC_stepper.currentPosition());
 }
